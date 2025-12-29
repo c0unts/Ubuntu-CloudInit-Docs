@@ -5,11 +5,12 @@ set -xe
 VMID="${VMID:-8200}"
 STORAGE="${STORAGE:-local-lvm}"
 
-IMG="plucky-server-cloudimg-amd64.img"
-IMG_NOIMG="plucky-server-cloudimg-amd64"
-BASE_URL="https://cloud-images.ubuntu.com/plucky/current"
+IMG="noble-server-cloudimg-amd64.img"
+IMG_NOIMG="noble-server-cloudimg-amd64"
+BASE_URL="https://cloud-images.ubuntu.com/noble/current"
 EXPECTED_SHA=$(wget -qO- "$BASE_URL/SHA256SUMS" | awk '/'$IMG'/{print $1}')
-NAME="ubuntu-plucky-template"
+NAME="ubuntu-noble-template"
+SHORT_NAME="noble"
 
 download() {
     wget -q "$BASE_URL/$IMG"
@@ -58,7 +59,7 @@ runcmd:
 EOF
 
 qm set $VMID --cicustom "vendor=local:snippets/ubuntu.yaml"
-qm set $VMID --tags ubuntu-template,plucky,cloudinit
+qm set $VMID --tags ubuntu-template,$SHORT_NAME,cloudinit
 qm set $VMID --ciuser $USER
 # qm set $VMID --sshkeys ~/.ssh/authorized_keys
 qm set $VMID --ipconfig0 ip=dhcp
