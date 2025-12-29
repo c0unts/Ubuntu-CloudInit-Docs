@@ -53,6 +53,8 @@ cat << EOF | tee /var/lib/vz/snippets/ubuntu.yaml
 runcmd:
     - apt-get update
     - apt-get install -y qemu-guest-agent
+    - systemctl enable qemu-guest-agent
+    - systemctl start qemu-guest-agent
     - systemctl enable ssh
     - reboot
 # Taken from https://forum.proxmox.com/threads/combining-custom-cloud-init-with-auto-generated.59008/page-3#post-428772
