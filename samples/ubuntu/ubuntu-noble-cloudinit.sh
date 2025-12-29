@@ -50,19 +50,17 @@ qm set $VMID --scsi1 $STORAGE:cloudinit
 
 cat << EOF | tee /var/lib/vz/snippets/ubuntu.yaml
 #cloud-config
+package_update: true
+packages:
+  - qemu-guest-agent
 runcmd:
-    - apt-get update
-    - apt-get install -y qemu-guest-agent
-    - systemctl enable qemu-guest-agent
-    - systemctl start qemu-guest-agent
-    - systemctl enable ssh
-    - reboot
+  - systemctl enable --now qemu-guest-agent
 # Taken from https://forum.proxmox.com/threads/combining-custom-cloud-init-with-auto-generated.59008/page-3#post-428772
 EOF
 
-qm set $VMID --cicustom "vendor=local:snippets/ubuntu.yaml"
+qm set $VMID --cicustom "user=local:snippets/ubuntu.yaml"
 qm set $VMID --tags ubuntu-template,$SHORT_NAME,cloudinit
 qm set $VMID --ciuser $USER
-# qm set $VMID --sshkeys ~/.ssh/authorized_keys
+qm set $VMID --sshkeys ~/lukas_public.pub
 qm set $VMID --ipconfig0 ip=dhcp
 qm template $VMID
