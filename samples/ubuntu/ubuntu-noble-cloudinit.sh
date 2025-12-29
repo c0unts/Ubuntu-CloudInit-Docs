@@ -3,11 +3,13 @@
 set -xe
 
 VMID="${VMID:-8200}"
-STORAGE="${STORAGE:-local-zfs}"
+STORAGE="${STORAGE:-local-lvm}"
 
-IMG="noble-server-cloudimg-amd64.img"
-BASE_URL="https://cloud-images.ubuntu.com/noble/current"
+IMG="plucky-server-cloudimg-amd64.img"
+IMG_NOIMG="plucky-server-cloudimg-amd64"
+BASE_URL="https://cloud-images.ubuntu.com/plucky/current"
 EXPECTED_SHA=$(wget -qO- "$BASE_URL/SHA256SUMS" | awk '/'$IMG'/{print $1}')
+NAME="ubuntu-plucky-template"
 
 download() {
     wget -q "$BASE_URL/$IMG"
@@ -28,12 +30,12 @@ if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
     [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ] && exit 1
 fi
 
-rm -f noble-server-cloudimg-amd64-resized.img
-cp noble-server-cloudimg-amd64.img noble-server-cloudimg-amd64-resized.img
-qemu-img resize noble-server-cloudimg-amd64-resized.img 8G
+rm -f $IMG_NOIMG-resized.img
+cp $IMG $IMG_NOIMG-resized.img
+qemu-img resize $IMG_NOIMG-resized.img 8G
 
 sudo qm destroy $VMID || true
-sudo qm create $VMID --name "ubuntu-noble-template" --ostype l26 \
+sudo qm create $VMID --name $NAME --ostype l26 \
     --memory 1024 --balloon 0 \
     --agent 1 \
     --bios ovmf --machine q35 --efidisk0 $STORAGE:0,pre-enrolled-keys=0 \
